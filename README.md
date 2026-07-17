@@ -71,7 +71,7 @@ flowchart TD
 ### Setup
 
 ```bash
-git clone https://github.com/SwayamDash07/oppfinder.git
+git clone https://github.com/SwayamDash07/OppFinder.git
 cd oppfinder
 npm install
 ```
