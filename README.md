@@ -4,6 +4,8 @@
 
 Built by **Threadbare** for the OpenAI × NamasteDev Hackathon.
 
+LIVE URL: https://opp-finder-woad.vercel.app/
+
 ## The Problem
 
 Student developers are eligible for dozens of hackathons, free AI credits, subscription discounts, student programs, certifications, and open-source programs — but they miss most of them. Not because they don't qualify, but because these opportunities are scattered across Twitter, Discord, newsletters, and company blogs, with no single place that tells you: *you specifically qualify for this, and here's why.*
@@ -108,6 +110,6 @@ Both are natural extensions of the same core idea: eligibility matching should r
 
 ## Team
 
-**Threadbare** — Swayam Dash
+**Threadbare** — Swayam Sankalp Dash, Shulin Patro, Ayas Kant das.
 
 Built as students still learning the ropes of full-stack and AI, using this hackathon as a chance to build something real, make mistakes, and get better at shipping.
