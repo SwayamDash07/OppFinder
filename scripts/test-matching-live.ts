@@ -1,9 +1,7 @@
 import { config } from "dotenv";
 import { resolve } from "node:path";
-import OpenAI from "openai";
 import { connectToDatabase } from "../lib/db";
 import {
-  buildSingleOpportunityPrompt,
   matchOpportunitiesForProfile,
   type MatchableOpportunity
 } from "../lib/matching";
@@ -13,8 +11,6 @@ import { UserProfileModel } from "../lib/models/user-profile";
 import type { UserProfile } from "../lib/profile";
 
 config({ path: resolve(process.cwd(), ".env.local") });
-
-const groqModel = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 type MatchRecord = {
   opportunityId: string;
@@ -78,34 +74,6 @@ async function loadOpportunities(): Promise<MatchableOpportunity[]> {
   }));
 }
 
-async function measureSampleTokens(profile: UserProfile, opportunity: MatchableOpportunity) {
-  const client = new OpenAI({
-    apiKey: process.env.GROQ_API_KEY,
-    baseURL: "https://api.groq.com/openai/v1"
-  });
-
-  const response = await client.chat.completions.create({
-    model: groqModel,
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are OppFinder's eligibility analyst. Compare one user's profile to one opportunity's structured eligibility criteria. Return strict JSON only. Do not invent requirements. Make the reason specific to the user's role, year, country, skills, interests, GitHub username, and student email signal when relevant."
-      },
-      {
-        role: "user",
-        content: buildSingleOpportunityPrompt(profile, opportunity)
-      }
-    ],
-    max_completion_tokens: 700,
-    response_format: {
-      type: "json_object"
-    }
-  });
-
-  return response.usage;
-}
-
 async function main() {
   if (!process.env.GROQ_API_KEY || !process.env.MONGODB_URI) {
     throw new Error("GROQ_API_KEY and MONGODB_URI must be configured in .env.local");
@@ -138,9 +106,6 @@ async function main() {
   console.log(
     `Throttle config: batchSize=${process.env.GROQ_BATCH_SIZE || 1}, intervalMs=${process.env.GROQ_BATCH_INTERVAL_MS || 30000}`
   );
-
-  const sampleUsage = await measureSampleTokens(profile, opportunities[0]);
-  console.log("Sample request token usage:", sampleUsage);
 
   await MatchResultModel.deleteMany({ profileKey });
 
@@ -207,7 +172,6 @@ async function main() {
         cacheHit: Boolean(cached),
         cachedMatchCount: cached?.matches.length ?? 0,
         schemaValid,
-        sampleUsage
       },
       null,
       2

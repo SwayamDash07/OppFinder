@@ -12,6 +12,8 @@ type MatchesPageProps = {
   }>;
 };
 
+export const maxDuration = 60;
+
 export default async function MatchesPage({ searchParams }: MatchesPageProps) {
   const [account, profile] = await Promise.all([
     getCurrentAccount(),
