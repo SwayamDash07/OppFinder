@@ -58,7 +58,7 @@ flowchart LR
 - **Backend:** Server Actions for application data and matching, with the Auth.js callback route required for GitHub OAuth; there are no client-side data fetches
 - **Database:** MongoDB Atlas through Mongoose
 - **AI:** Groq's OpenAI-compatible API through the OpenAI SDK
-- **Default model:** `openai/gpt-oss-120b`
+- **Default model:** `openai/gpt-oss-20b`
 - **Styling:** plain CSS, CSS custom properties, and explicit mobile breakpoints; no Tailwind
 - **Deployment:** Vercel
 
@@ -89,8 +89,8 @@ The matching layer is intended to reason over eligibility, not simply summarize 
 
 1. The saved profile and opportunities are loaded on the server.
 2. A lightweight relevance shortlist uses category, tags, skills, interests, country, study year, GitHub, and student-email signals to focus the AI work.
-3. Each shortlisted opportunity is sent to Groq with the user's profile and the opportunity's structured criteria.
-4. The model returns strict structured output:
+3. Shortlisted opportunities are sent to Groq in small batches with the user's profile and each opportunity's structured criteria.
+4. The model returns one strict result object per opportunity in each batch:
 
    ```json
    {
@@ -101,7 +101,7 @@ The matching layer is intended to reason over eligibility, not simply summarize 
    }
    ```
 
-5. Calls are batched and throttled using environment-configurable settings so the app can operate within provider limits.
+5. Batched calls use a short configurable interval and stay within provider RPM/TPM limits; malformed batch responses get one repair retry.
 6. Results are stored in MongoDB and reused for 24 hours for the same profile key.
 7. The dashboard enriches the result with the original opportunity data and presents the ranked feed.
 
@@ -186,9 +186,9 @@ Register these callback URLs with the providers: `http://localhost:3000/api/auth
 Optional matching controls:
 
 ```env
-GROQ_MODEL="openai/gpt-oss-120b"
-GROQ_BATCH_SIZE="1"
-GROQ_BATCH_INTERVAL_MS="30000"
+GROQ_MODEL="openai/gpt-oss-20b"
+GROQ_BATCH_SIZE="5"
+GROQ_BATCH_INTERVAL_MS="250"
 MATCH_SHORTLIST_LIMIT="18"
 ```
 
@@ -213,7 +213,7 @@ The live matching smoke test is available as:
 npx tsx scripts/test-matching-live.ts
 ```
 
-It requires `MONGODB_URI` and `GROQ_API_KEY` and exercises cache-miss, cache-hit, throttling, and structured-output behavior against the configured services.
+It requires `MONGODB_URI` and `GROQ_API_KEY` and exercises cache-miss, cache-hit, batched matching, throttling, and structured-output behavior against the configured services.
 
 ## Business approach
 
