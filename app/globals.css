@@ -385,7 +385,7 @@ textarea {
 .profile-page {
   width: min(100%, var(--content));
   margin: 0 auto;
-  padding: 52px 24px;
+  padding: 72px 24px 52px;
 }
 
 .page-heading {
@@ -396,7 +396,7 @@ textarea {
 .page-heading h1 {
   margin: 0;
   font-size: clamp(2.2rem, 6vw, 4.8rem);
-  line-height: 1;
+  line-height: 1.08;
   letter-spacing: 0;
 }
 
@@ -1131,7 +1131,7 @@ textarea {
   }
 
   .profile-page {
-    padding: 38px 18px;
+    padding: 54px 18px 38px;
   }
 
   .profile-layout {
