@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { login, signup, type AuthFormState } from "@/app/actions/auth";
 import { GitHubSignInButton } from "@/app/components/GitHubSignInButton";
+import { GoogleSignInButton } from "@/app/components/GoogleSignInButton";
 
 type AuthFormProps = {
   mode: "login" | "signup";
@@ -75,6 +76,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       </div>
       <div className="auth-divider" aria-hidden="true"><span>or</span></div>
       <GitHubSignInButton />
+      <GoogleSignInButton />
     </form>
   );
 }

@@ -40,10 +40,11 @@ flowchart LR
 ## Core features
 
 - **Profile-based matching:** results use the saved profile rather than generic keyword search.
-- **Authentication choices:** users can sign in with email/password or GitHub OAuth; OAuth-linked users have their GitHub username populated automatically for public-repository enrichment.
+- **Role-aware matching:** opportunities are tagged as student-only, professional-only, or open to all. The AI explicitly checks the user's role, excludes mismatched opportunities from eligible results, and explains the mismatch clearly, such as noting that a program requires active student enrollment.
+- **Authentication choices:** users can sign in with email/password, GitHub OAuth, or Google OAuth; GitHub-linked users have their GitHub username populated automatically for public-repository enrichment.
 - **Eligibility reasoning:** the model compares profile attributes against structured criteria and explains the result.
 - **Urgency scoring:** each match receives a 1-5 urgency score based on deadline pressure and fit.
-- **107 seeded opportunities:** the current dataset is spread across six categories: hackathons, AI free trials, subscription offers, student programs, certifications, and open-source programs.
+- **127 seeded opportunities:** the current dataset is spread across six categories: 18 hackathons, 21 AI free trials, 20 subscription offers, 17 student programs, 24 certifications, and 27 open-source programs.
 - **Browse controls:** browse uses MongoDB directly, with category filtering, latest-deadline sorting, popularity sorting, deadline-soonest sorting, and company/organization filtering. Browse does not call Groq.
 - **Protected profile and dashboard:** users must be authenticated, and a profile is required before accessing the personalized dashboard or browse directory.
 - **24-hour match cache:** repeated dashboard visits can reuse cached results for the same saved profile instead of calling the model again.
@@ -66,7 +67,7 @@ flowchart LR
 - `/` - product landing page and demo narrative
 - `/login` - account login
 - `/signup` - account creation
-- `/api/auth/[...nextauth]` - Auth.js GitHub OAuth sign-in and callback route
+- `/api/auth/[...nextauth]` - Auth.js GitHub and Google OAuth sign-in and callback route
 - `/profile` - profile creation and editing
 - `/matches` - AI-ranked dashboard and cached match results
 - `/browse` - full MongoDB opportunity directory
@@ -132,8 +133,11 @@ Each opportunity includes:
 - `tags`
 - `value`
 - `popularity`
+- `eligibilityCriteria.audience` (`student`, `professional`, or `all`)
 
-The seed data is intentionally curated instead of scraped live. Entries use recognizable programs and official destination links where possible. Availability, pricing, eligibility, and dates can change, so users should confirm final terms on the linked provider page.
+The current audience breakdown is 40 student-only, 9 professional-only, and 78 open-to-all opportunities. The seed data is intentionally curated instead of scraped live. Entries use recognizable programs and official destination links where possible. Availability, pricing, eligibility, and dates can change, so users should confirm final terms on the linked provider page.
+
+The current dataset is a curated set sized for this hackathon's free-tier infrastructure, including MongoDB Atlas and Groq. This is a deliberate hackathon-scope choice, not a technical ceiling: the matching pipeline, schema, and caching layer already support a dataset of any size; only the free-tier data volume and API rate limits are being kept modest here.
 
 Run the seed script after configuring MongoDB:
 
@@ -166,14 +170,18 @@ MONGODB_URI="mongodb+srv://username:password@cluster.example.mongodb.net/oppfind
 GROQ_API_KEY="gsk_your_groq_api_key_here"
 ```
 
-GitHub OAuth is optional. Email/password authentication works without these variables. Add the following only when GitHub sign-in is enabled:
+GitHub and Google OAuth are optional. Email/password authentication works without these variables. Add the following only when either OAuth provider is enabled:
 
 ```env
 GITHUB_OAUTH_CLIENT_ID="your_github_oauth_client_id"
 GITHUB_OAUTH_CLIENT_SECRET="your_github_oauth_client_secret"
+GOOGLE_OAUTH_CLIENT_ID="your_google_oauth_client_id"
+GOOGLE_OAUTH_CLIENT_SECRET="your_google_oauth_client_secret"
 NEXTAUTH_SECRET="your_long_random_nextauth_secret"
 NEXTAUTH_URL="http://localhost:3000"
 ```
+
+Register these callback URLs with the providers: `http://localhost:3000/api/auth/callback/github`, `http://localhost:3000/api/auth/callback/google`, and the equivalent production URLs under `https://opp-finder-woad.vercel.app`.
 
 Optional matching controls:
 

@@ -134,13 +134,16 @@ export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileF
           )}
 
           <label className="field">
-            <span>Student email domain</span>
+            <span>Student email / academic domain</span>
             <input
               name="studentEmailDomain"
               defaultValue={state.values.studentEmailDomain}
-              placeholder="university.edu"
+              placeholder="you@university.edu"
               aria-invalid={!!state.errors.studentEmailDomain}
             />
+            <small className="field-hint">
+              Required for students; professionals can leave this blank.
+            </small>
             {state.errors.studentEmailDomain ? (
               <small>{state.errors.studentEmailDomain}</small>
             ) : null}

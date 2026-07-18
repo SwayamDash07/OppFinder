@@ -162,13 +162,13 @@ export function validateProfileForm(formData: FormData): {
     errors.interests = "Add at least one interest or a valid GitHub username.";
   }
 
-  if (values.studentEmailDomain) {
+  if (values.role === "student") {
     const emailDomain = getEmailDomain(values.studentEmailDomain);
     const isCommonPersonalDomain = [...blockedStudentEmailDomains].some(
       (domain) => emailDomain === domain || emailDomain.endsWith(`.${domain}`)
     );
 
-    if (isCommonPersonalDomain || !academicDomainPattern.test(emailDomain)) {
+    if (!values.studentEmailDomain || isCommonPersonalDomain || !academicDomainPattern.test(emailDomain)) {
       errors.studentEmailDomain = "Please use your official college/university email address.";
     }
   }

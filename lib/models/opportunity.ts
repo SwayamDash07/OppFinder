@@ -11,8 +11,18 @@ export const opportunityCategories = [
 
 export type OpportunityCategory = (typeof opportunityCategories)[number];
 
+export const opportunityAudiences = ["student", "professional", "all"] as const;
+
+export type OpportunityAudience = (typeof opportunityAudiences)[number];
+
 const eligibilityCriteriaSchema = new Schema(
   {
+    audience: {
+      type: String,
+      enum: opportunityAudiences,
+      required: true,
+      default: "all"
+    },
     studentStatus: {
       type: String,
       enum: ["required", "preferred", "not_required"],

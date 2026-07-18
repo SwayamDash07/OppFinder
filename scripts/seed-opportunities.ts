@@ -13,6 +13,12 @@ const categories = [
 
 const eligibilityCriteriaSchema = new mongoose.Schema(
   {
+    audience: {
+      type: String,
+      enum: ["student", "professional", "all"],
+      required: true,
+      default: "all"
+    },
     studentStatus: {
       type: String,
       enum: ["required", "preferred", "not_required"],
