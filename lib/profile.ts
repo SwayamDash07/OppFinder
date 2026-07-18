@@ -13,6 +13,22 @@ export const yearsOfStudy = [
 export type Role = (typeof roles)[number];
 export type YearOfStudy = (typeof yearsOfStudy)[number];
 
+const blockedStudentEmailDomains = new Set([
+  "gmail.com",
+  "yahoo.com",
+  "outlook.com",
+  "hotmail.com",
+  "icloud.com",
+  "protonmail.com"
+]);
+
+const academicDomainPattern = /^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+(?:edu|ac\.in|edu\.in)$/i;
+
+function getEmailDomain(value: string) {
+  const atIndex = value.lastIndexOf("@");
+  return (atIndex >= 0 ? value.slice(atIndex + 1) : value).toLowerCase();
+}
+
 export type UserProfile = {
   role: Role;
   yearOfStudy: YearOfStudy;
@@ -140,13 +156,15 @@ export function validateProfileForm(formData: FormData): {
     errors.githubUsername = "Enter a valid GitHub username.";
   }
 
-  if (
-    values.studentEmailDomain &&
-    !/^(?:[^\s@]+@)?(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+(?:edu|ac\.in|edu\.in)$/i.test(
-      values.studentEmailDomain
-    )
-  ) {
-    errors.studentEmailDomain = "Please use your official college/university email.";
+  if (values.studentEmailDomain) {
+    const emailDomain = getEmailDomain(values.studentEmailDomain);
+    const isCommonPersonalDomain = [...blockedStudentEmailDomains].some(
+      (domain) => emailDomain === domain || emailDomain.endsWith(`.${domain}`)
+    );
+
+    if (isCommonPersonalDomain || !academicDomainPattern.test(emailDomain)) {
+      errors.studentEmailDomain = "Please use your official college/university email address.";
+    }
   }
 
   if (Object.keys(errors).length > 0) {

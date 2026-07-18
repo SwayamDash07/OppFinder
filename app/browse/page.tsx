@@ -22,8 +22,12 @@ const categoryLabels: Record<OpportunityCategory, string> = {
 type BrowsePageProps = {
   searchParams: Promise<{
     category?: string;
+    sort?: string;
+    company?: string;
   }>;
 };
+
+type BrowseSort = "latest" | "popular" | "deadline";
 
 type BrowseOpportunity = {
   id: string;
@@ -32,6 +36,8 @@ type BrowseOpportunity = {
   description: string;
   deadline: string;
   link: string;
+  companyName: string;
+  popularity: number;
   value: string;
   tags: string[];
   eligibilityCriteria: {
@@ -96,7 +102,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   )
     ? (params.category as OpportunityCategory)
     : "hackathon";
-  const opportunities = await getOpportunities(activeCategory);
+  const activeSort: BrowseSort = ["latest", "popular", "deadline"].includes(params.sort ?? "")
+    ? (params.sort as BrowseSort)
+    : "latest";
+  const selectedCompany = params.company ?? "";
+  const [opportunities, companies] = await Promise.all([
+    getOpportunities(activeCategory, activeSort, selectedCompany),
+    getCompanies(activeCategory)
+  ]);
   const latestUpdate = getLatestUpdate(opportunities);
 
   return (
@@ -128,6 +141,29 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
       </section>
 
+      <form className="browse-controls" method="get">
+        <input type="hidden" name="category" value={activeCategory} />
+        <label>
+          <span>Sort by</span>
+          <select name="sort" defaultValue={activeSort}>
+            <option value="latest">Latest</option>
+            <option value="popular">Most popular</option>
+            <option value="deadline">Deadline soonest</option>
+          </select>
+        </label>
+        <label>
+          <span>Company / organization</span>
+          <select name="company" defaultValue={selectedCompany}>
+            <option value="">All companies</option>
+            {companies.map((company) => (
+              <option key={company} value={company}>{company}</option>
+            ))}
+          </select>
+        </label>
+        <button className="button button--secondary" type="submit">Apply</button>
+      </form>
+      <p className="browse-controls__hint">Latest sorts by deadline, with the furthest upcoming deadline first.</p>
+
       <nav className="category-tabs" aria-label="Opportunity categories">
         {opportunityCategories.map((category) => (
           <Link
@@ -136,7 +172,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 ? "category-tab category-tab--active"
                 : "category-tab"
             }
-            href={`/browse?category=${category}`}
+            href={browseHref(category, activeSort, selectedCompany)}
             key={category}
           >
             {categoryLabels[category]}
@@ -158,6 +194,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                     {formatDeadline(opportunity.deadline)}
                   </span>
                 </div>
+                <p className="browse-company">{opportunity.companyName}</p>
                 <h3>{opportunity.title}</h3>
                 <p className="result-card__description">{opportunity.description}</p>
 
@@ -204,15 +241,26 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   );
 }
 
-async function getOpportunities(category: OpportunityCategory): Promise<BrowseOpportunity[]> {
+async function getOpportunities(
+  category: OpportunityCategory,
+  sort: BrowseSort,
+  companyName: string
+): Promise<BrowseOpportunity[]> {
   await connectToDatabase();
 
-  const opportunities = await OpportunityModel.find({ category })
-    .sort({ deadline: 1, title: 1 })
+  const filter = companyName ? { category, companyName } : { category };
+  const sortBy: Record<string, 1 | -1> = sort === "popular"
+    ? { popularity: -1, title: 1 }
+    : sort === "deadline"
+      ? { deadline: 1, title: 1 }
+      : { deadline: -1, title: 1 };
+  const opportunities = await OpportunityModel.find(filter)
+    .sort(sortBy)
     .lean<
       {
         _id: { toString(): string };
         title: string;
+        companyName: string;
         category: OpportunityCategory;
         description: string;
         eligibilityCriteria: BrowseOpportunity["eligibilityCriteria"];
@@ -220,6 +268,7 @@ async function getOpportunities(category: OpportunityCategory): Promise<BrowseOp
         link: string;
         tags: string[];
         value: string;
+        popularity?: number;
         updatedAt?: Date;
       }[]
     >();
@@ -227,6 +276,7 @@ async function getOpportunities(category: OpportunityCategory): Promise<BrowseOp
   return opportunities.map((opportunity) => ({
     id: opportunity._id.toString(),
     title: opportunity.title,
+    companyName: opportunity.companyName,
     category: opportunity.category,
     description: opportunity.description,
     eligibilityCriteria: opportunity.eligibilityCriteria,
@@ -234,8 +284,21 @@ async function getOpportunities(category: OpportunityCategory): Promise<BrowseOp
     link: opportunity.link,
     tags: opportunity.tags,
     value: opportunity.value,
+    popularity: opportunity.popularity ?? 0,
     updatedAt: opportunity.updatedAt?.toISOString()
   }));
+}
+
+async function getCompanies(category: OpportunityCategory) {
+  await connectToDatabase();
+  const companies = await OpportunityModel.distinct("companyName", { category });
+  return companies.filter((company): company is string => Boolean(company)).sort((a, b) => a.localeCompare(b));
+}
+
+function browseHref(category: OpportunityCategory, sort: BrowseSort, company: string) {
+  const query = new URLSearchParams({ category, sort });
+  if (company) query.set("company", company);
+  return `/browse?${query.toString()}`;
 }
 
 function formatDeadline(deadline: string) {

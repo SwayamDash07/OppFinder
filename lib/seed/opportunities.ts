@@ -1,9 +1,25 @@
 import type { OpportunityCategory } from "@/lib/models/opportunity";
 
-export type SeedOpportunity = {
+type SeedDefinition = {
   title: string;
+  companyName?: string;
   category: OpportunityCategory;
   description: string;
+  link: string;
+  tags: string[];
+  value: string;
+  deadline?: string;
+  studentStatus?: "required" | "preferred" | "not_required";
+  skillTags?: string[];
+  country?: string[];
+  studentEmailRequired?: boolean;
+  githubRequired?: boolean;
+  other?: string;
+  popularity?: number;
+  minimumAge?: number;
+};
+
+export type SeedOpportunity = Omit<SeedDefinition, "deadline" | "companyName"> & { companyName?: string; deadline: string } & {
   eligibilityCriteria: {
     studentStatus: "required" | "preferred" | "not_required";
     country: string[];
@@ -14,706 +30,148 @@ export type SeedOpportunity = {
     githubRequired: boolean;
     other: string;
   };
-  deadline: string;
-  link: string;
-  tags: string[];
-  value: string;
 };
 
-export const seedOpportunities: SeedOpportunity[] = [
-  {
-    title: "Global AI Hackathon Series with Qwen",
-    category: "hackathon",
-    description:
-      "An online Devpost AI hackathon series for building projects with Qwen models and modern AI tooling.",
+const upcoming = "2026-12-31T23:59:00.000Z";
+const studentYears = ["freshman", "sophomore", "junior", "senior", "graduate"];
+
+function defineOpportunity(definition: SeedDefinition): SeedOpportunity {
+  const studentProgram = ["student_program", "subscription_offer", "certification"].includes(
+    definition.category
+  );
+
+  return {
+    ...definition,
+    deadline: definition.deadline ?? upcoming,
+    popularity: definition.popularity ?? 50,
     eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["global"],
-      skillTags: ["ai", "python", "javascript", "cloud", "product"],
-      yearOfStudy: [],
-      minimumAge: 13,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Best fit for students or early-career builders comfortable shipping an AI prototype before the August deadline."
-    },
-    deadline: "2026-08-17T23:59:00.000Z",
-    link: "https://devpost.com/",
-    tags: ["ai", "hackathon", "qwen", "global"],
-    value: "Online AI hackathon participation, community visibility, and prizes"
-  },
-  {
-    title: "DevNetwork API + Cloud + AI Hackathon 2026",
-    category: "hackathon",
-    description:
-      "A Devpost-hosted hackathon focused on API, cloud, and AI projects during the DevNetwork event cycle.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["United States", "global"],
-      skillTags: ["api", "cloud", "ai", "javascript", "python"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      minimumAge: 13,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Good fit for full-stack builders who can create an API, cloud, or AI demo."
-    },
-    deadline: "2026-08-17T23:59:00.000Z",
-    link: "https://api-cloud-ai-hackathon-2026.devpost.com/",
-    tags: ["hackathon", "api", "cloud", "ai"],
-    value: "Hackathon project sprint, Devpost visibility, and challenge prizes"
-  },
-  {
-    title: "MLH Hackcon 2026",
-    category: "hackathon",
-    description:
-      "A Major League Hacking gathering for hackathon organizers and student community leaders.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["United States", "Canada", "global"],
-      skillTags: ["community", "leadership", "hackathons", "operations"],
-      yearOfStudy: [],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Most relevant for students organizing clubs, hackathons, or developer communities."
-    },
-    deadline: "2026-08-21T23:59:00.000Z",
-    link: "https://ti.to/mlh/mlh-hackcon-2026",
-    tags: ["hackathon", "leadership", "community"],
-    value: "Organizer training, peer network, and hackathon community access"
-  },
-  {
-    title: "NASA Space Apps Challenge 2026",
-    category: "hackathon",
-    description:
-      "A global hackathon where teams use open data to solve challenges connected to space, Earth science, and exploration.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["data-science", "python", "gis", "visualization", "space"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Open to participants globally; local event availability varies by city."
-    },
-    deadline: "2026-11-14T23:59:00.000Z",
-    link: "https://www.spaceappschallenge.org/",
-    tags: ["hackathon", "space", "data", "global"],
-    value: "Global challenge participation, open-data project portfolio, and awards"
-  },
-  {
-    title: "HackMIT 2026",
-    category: "hackathon",
-    description:
-      "A student-run hackathon at MIT for teams building technical prototypes over a concentrated weekend.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["United States", "global"],
-      skillTags: ["web", "ai", "hardware", "design", "product"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Requires student status and acceptance through the event application process."
-    },
-    deadline: "2026-09-15T23:59:00.000Z",
-    link: "https://hackmit.org/",
-    tags: ["hackathon", "mit", "student", "prototype"],
-    value: "Competitive hackathon experience, workshops, mentors, and prizes"
-  },
-  {
-    title: "Hack the North 2026",
-    category: "hackathon",
-    description:
-      "A large student hackathon hosted in Canada with mentorship, sponsor challenges, and project demos.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["Canada", "United States", "global"],
-      skillTags: ["web", "mobile", "ai", "hardware", "design"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Applicants typically need to be students and may need travel eligibility for the in-person event."
-    },
-    deadline: "2026-09-01T23:59:00.000Z",
-    link: "https://hackthenorth.com/",
-    tags: ["hackathon", "canada", "student", "startup"],
-    value: "Mentorship, community, sponsor tracks, and prizes"
-  },
-  {
-    title: "Google AI Studio Free Tier",
-    category: "ai_free_trial",
-    description:
-      "Google AI Studio provides browser-based access to Gemini models for prototyping prompts and AI applications.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["ai", "prompting", "javascript", "python"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Usage limits and model availability may vary by region and account."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://aistudio.google.com/",
-    tags: ["ai", "gemini", "prompting", "prototype"],
-    value: "Free model access for experiments and prototypes"
-  },
-  {
-    title: "GitHub Copilot for Verified Students",
-    category: "ai_free_trial",
-    description:
-      "Verified students can access GitHub Copilot through GitHub Education benefits for coding assistance inside supported editors.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["github", "javascript", "python", "typescript", "developer-tools"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires GitHub Education verification."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://github.com/education/students",
-    tags: ["ai", "github", "copilot", "student"],
-    value: "Free access to AI pair-programming features for verified students"
-  },
-  {
-    title: "Notion AI for GitHub-Verified Students",
-    category: "ai_free_trial",
-    description:
-      "GitHub-verified students can access Notion's education offer with additional AI responses for student workspaces.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["writing", "productivity", "research", "planning"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires a GitHub-verified student account and Notion education signup."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.notion.so/githubstudentpack",
-    tags: ["ai", "notion", "student", "productivity"],
-    value: "Education Plus workspace with additional AI responses"
-  },
-  {
-    title: "Replit Student Developer Pack Offer",
-    category: "ai_free_trial",
-    description:
-      "A GitHub Student Developer Pack partner offer for cloud development and AI-assisted coding experiments in Replit.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["web", "python", "javascript", "ai", "prototyping"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires GitHub Student Developer Pack verification."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://education.github.com/pack",
-    tags: ["ai", "cloud-ide", "github-pack", "prototype"],
-    value: "Student developer credits or plan access through GitHub Education"
-  },
-  {
-    title: "Deepnote Education",
-    category: "ai_free_trial",
-    description:
-      "Deepnote supports student data science workflows with collaborative notebooks and AI-assisted analysis features.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["global"],
-      skillTags: ["data-science", "python", "machine-learning", "analytics"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Most relevant for coursework, research notebooks, and data projects."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://deepnote.com/education",
-    tags: ["ai", "data-science", "notebooks", "education"],
-    value: "Collaborative notebook tooling for classes and projects"
-  },
-  {
-    title: "Perplexity Student Program",
-    category: "ai_free_trial",
-    description:
-      "A student-focused AI research assistant offer for faster research, source discovery, and study workflows.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["research", "writing", "ai", "study"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Requires school verification where available."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.perplexity.ai/students",
-    tags: ["ai", "research", "student"],
-    value: "Student access or discount for AI research features"
-  },
-  {
-    title: "GitHub Student Developer Pack",
-    category: "subscription_offer",
-    description:
-      "A bundle of student-only developer tools including hosting, databases, domains, APIs, learning platforms, and productivity services.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["github", "web", "cloud", "databases", "developer-tools"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires proof of current student enrollment through GitHub Education."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://education.github.com/pack",
-    tags: ["student-pack", "github", "developer-tools"],
-    value: "Dozens of professional developer tools at no cost for verified students"
-  },
-  {
-    title: "JetBrains Student Pack",
-    category: "subscription_offer",
-    description:
-      "Free educational licenses for JetBrains IDEs and developer tools for students in accredited programs.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["java", "kotlin", "python", "javascript", "ide"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Applicants must be enrolled in an accredited educational program lasting longer than one year."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.jetbrains.com/academy/student-pack/",
-    tags: ["ide", "student", "jetbrains", "developer-tools"],
-    value: "Free access to JetBrains IDEs for educational use"
-  },
-  {
-    title: "Notion Education Plus Plan",
-    category: "subscription_offer",
-    description:
-      "A free Plus Plan for individual students and educators using a verified education institution email.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["productivity", "writing", "planning", "collaboration"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Available to students and teachers signed in with an eligible education institution email."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.notion.com/help/notion-for-education",
-    tags: ["notion", "student", "productivity"],
-    value: "Free Notion Plus workspace for individual education use"
-  },
-  {
-    title: "Canva for Education",
-    category: "subscription_offer",
-    description:
-      "Canva's education offering provides design and collaboration tools for eligible education communities.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["global"],
-      skillTags: ["design", "presentation", "marketing", "content"],
-      yearOfStudy: [],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Availability depends on institution and role; most useful for class projects, pitch decks, and student organizations."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.canva.com/education/",
-    tags: ["design", "education", "presentation"],
-    value: "Design and presentation tooling for education use"
-  },
-  {
-    title: "Figma for Education",
-    category: "subscription_offer",
-    description:
-      "Figma offers free education access for students and educators working on design, UI, and prototyping projects.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["design", "ui", "ux", "prototype", "frontend"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Requires education verification."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.figma.com/education/",
-    tags: ["figma", "design", "student", "prototype"],
-    value: "Free access to Figma education features for design work"
-  },
-  {
-    title: "Namecheap for Education",
-    category: "subscription_offer",
-    description:
-      "A GitHub Student Developer Pack domain offer that helps students publish portfolios and project demos.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["web", "portfolio", "deployment", "dns"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires GitHub Student Developer Pack access."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://education.github.com/pack",
-    tags: ["domain", "github-pack", "web", "portfolio"],
-    value: "Student domain benefit through GitHub Education"
-  },
-  {
-    title: "Microsoft Learn Student Ambassadors",
-    category: "student_program",
-    description:
-      "A global Microsoft student community for learning AI, cloud, developer tools, and community leadership.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["ai", "azure", "leadership", "community", "cloud"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Open to students from many backgrounds; practical learning and community contribution are the main fit signals."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://learn.microsoft.com/en-us/training/student-hub/become-a-student-ambassador",
-    tags: ["microsoft", "student", "community", "ai"],
-    value: "Learning paths, community recognition, and leadership experience"
-  },
-  {
-    title: "GitHub Campus Experts",
-    category: "student_program",
-    description:
-      "A student leadership program for building technical communities on campus with GitHub training and support.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["github", "community", "leadership", "open-source"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Applicants must first qualify for the GitHub Student Developer Pack."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://github.com/education/students/campus-expert",
-    tags: ["github", "campus", "leadership", "student"],
-    value: "Community leadership training, GitHub recognition, and campus support"
-  },
-  {
-    title: "AWS Educate",
-    category: "student_program",
-    description:
-      "A beginner-friendly cloud learning program with hands-on labs, learning content, and career resources.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["aws", "cloud", "devops", "backend", "security"],
-      yearOfStudy: [],
-      minimumAge: 13,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Learners can register with an email address; no credit card is needed."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://aws.amazon.com/education/awseducate/",
-    tags: ["aws", "cloud", "student", "learning"],
-    value: "Free cloud learning labs, badges, and career content"
-  },
-  {
-    title: "Google Developer Student Clubs",
-    category: "student_program",
-    description:
-      "A university-based community program for students learning Google developer technologies and building local projects.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["android", "web", "cloud", "ai", "community"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Availability depends on whether a campus chapter or lead application is open."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://developers.google.com/community/gdsc",
-    tags: ["google", "student", "community", "developer"],
-    value: "Peer learning, events, project experience, and community leadership"
-  },
-  {
-    title: "Postman Student Program",
-    category: "student_program",
-    description:
-      "A student-focused API learning program with resources for API design, testing, and collaboration.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["api", "backend", "testing", "javascript", "collaboration"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: false,
-      other: "Best fit for students building backend, API, or full-stack projects."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.postman.com/student-program/",
-    tags: ["api", "postman", "student", "backend"],
-    value: "API learning resources, student community, and workspace benefits"
-  },
-  {
-    title: "MLH Fellowship",
-    category: "student_program",
-    description:
-      "A remote internship-style program for software engineering, open source, production engineering, and technical learning tracks.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["global"],
-      skillTags: ["software-engineering", "open-source", "python", "javascript", "devops"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "Requires enough coding experience to pass the program application and time commitment."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://fellowship.mlh.io/",
-    tags: ["mlh", "fellowship", "remote", "software-engineering"],
-    value: "Structured project experience, mentorship, and resume-ready work"
-  },
-  {
-    title: "MongoDB Student Certification Benefit",
-    category: "certification",
-    description:
-      "MongoDB student benefits include free certification access through the GitHub Student Developer Pack.",
-    eligibilityCriteria: {
-      studentStatus: "required",
-      country: ["global"],
-      skillTags: ["mongodb", "database", "backend", "node"],
-      yearOfStudy: ["high-school", "freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: true,
-      githubRequired: true,
-      other: "Requires GitHub Student Developer Pack eligibility and completion of an eligible MongoDB University learning path."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.mongodb.com/students",
-    tags: ["mongodb", "certification", "database", "student"],
-    value: "Free MongoDB certification voucher and $50 Atlas credits"
-  },
-  {
-    title: "freeCodeCamp Responsive Web Design Certification",
-    category: "certification",
-    description:
-      "A free project-based certification covering HTML, CSS, accessibility, responsive layouts, and web fundamentals.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["html", "css", "frontend", "accessibility", "web"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Open to anyone who completes the required projects."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/",
-    tags: ["certification", "frontend", "free", "web"],
-    value: "Free portfolio projects and certification"
-  },
-  {
-    title: "freeCodeCamp JavaScript Algorithms and Data Structures",
-    category: "certification",
-    description:
-      "A free JavaScript certification focused on programming fundamentals, algorithms, and project practice.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["javascript", "algorithms", "frontend", "problem-solving"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Open to anyone who completes the curriculum and certification projects."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/",
-    tags: ["certification", "javascript", "free"],
-    value: "Free JavaScript certification and practice projects"
-  },
-  {
-    title: "AWS Educate Introduction to Cloud 101 Badge",
-    category: "certification",
-    description:
-      "A beginner AWS Educate learning badge that helps students prove cloud fundamentals before deeper certifications.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["aws", "cloud", "backend", "devops"],
-      yearOfStudy: [],
-      minimumAge: 13,
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Available through AWS Educate learning content."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://aws.amazon.com/education/awseducate/",
-    tags: ["aws", "cloud", "badge", "certification"],
-    value: "Free cloud learning badge for beginner AWS knowledge"
-  },
-  {
-    title: "Microsoft Learn AI Skills Challenge",
-    category: "certification",
-    description:
-      "Microsoft Learn collections and challenges help students build AI and cloud skills with guided modules.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["ai", "azure", "cloud", "machine-learning"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Availability of challenge rewards may vary, but the learning paths are open online."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://learn.microsoft.com/en-us/training/",
-    tags: ["microsoft", "ai", "learning", "certification"],
-    value: "Guided learning modules and preparation for Microsoft credentials"
-  },
-  {
-    title: "Kaggle Micro-Courses Certificates",
-    category: "certification",
-    description:
-      "Short, free practical courses for Python, pandas, machine learning, SQL, and data visualization.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["python", "machine-learning", "data-science", "sql"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Open to anyone with a Kaggle account."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.kaggle.com/learn",
-    tags: ["kaggle", "data-science", "python", "certification"],
-    value: "Free course completion certificates and practical notebooks"
-  },
-  {
-    title: "Google Summer of Code 2027 Preparation",
-    category: "open_source_program",
-    description:
-      "A preparation opportunity for the next Google Summer of Code contributor cycle, using the official program timeline and organization discovery flow.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["open-source", "python", "javascript", "go", "documentation"],
-      yearOfStudy: [],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "The 2026 contributor window has closed; this entry is for students preparing early for the next cycle by shortlisting organizations and making starter contributions."
-    },
-    deadline: "2027-03-31T18:00:00.000Z",
-    link: "https://developers.google.com/open-source/gsoc/timeline",
-    tags: ["open-source", "gsoc", "mentorship", "global"],
-    value: "Mentored open-source project experience and contributor stipend"
-  },
-  {
-    title: "Outreachy Internships",
-    category: "open_source_program",
-    description:
-      "A remote internship program supporting people subject to systemic bias and underrepresentation in tech.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["open-source", "documentation", "python", "linux", "community"],
-      yearOfStudy: [],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "Applicants must meet Outreachy eligibility rules, including availability and underrepresentation criteria."
-    },
-    deadline: "2026-08-31T23:59:00.000Z",
-    link: "https://www.outreachy.org/",
-    tags: ["open-source", "internship", "remote", "diversity"],
-    value: "Paid remote open-source internship and mentorship"
-  },
-  {
-    title: "Linux Foundation Mentorship Program",
-    category: "open_source_program",
-    description:
-      "Mentorship opportunities across Linux Foundation projects for contributors building open-source skills.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["linux", "open-source", "cloud-native", "security", "devops"],
-      yearOfStudy: [],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "Specific eligibility and deadlines vary by mentorship term and project."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://mentorship.lfx.linuxfoundation.org/",
-    tags: ["open-source", "linux", "mentorship", "devops"],
-    value: "Mentored open-source contribution experience across foundation projects"
-  },
-  {
-    title: "Season of KDE",
-    category: "open_source_program",
-    description:
-      "A KDE community mentorship program for new contributors working on open-source software, design, documentation, and outreach.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["open-source", "qt", "c++", "design", "documentation"],
-      yearOfStudy: [],
-      studentEmailRequired: false,
-      githubRequired: false,
-      other: "Applicants should match with a KDE project and mentor during the active season."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://season.kde.org/",
-    tags: ["open-source", "kde", "mentorship"],
-    value: "Mentorship and recognized KDE contribution experience"
-  },
-  {
-    title: "Google Summer of Code Organizations Explorer",
-    category: "open_source_program",
-    description:
-      "An explorer for finding past and current GSoC organizations by technology tags and project areas.",
-    eligibilityCriteria: {
-      studentStatus: "not_required",
-      country: ["global"],
-      skillTags: ["open-source", "research", "python", "javascript", "devops"],
-      yearOfStudy: [],
-      minimumAge: 18,
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "Useful for preparing future GSoC applications and finding organizations before application windows open."
-    },
-    deadline: "2026-12-31T23:59:00.000Z",
-    link: "https://www.gsocorganizations.dev/",
-    tags: ["open-source", "gsoc", "research", "organizations"],
-    value: "Discovery path for matching skills to open-source mentoring organizations"
-  },
-  {
-    title: "Open Source Promotion Plan 2027 Preparation",
-    category: "open_source_program",
-    description:
-      "A preparation opportunity for students interested in the Open Source Promotion Plan summer mentorship cycle.",
-    eligibilityCriteria: {
-      studentStatus: "preferred",
-      country: ["China", "global"],
-      skillTags: ["open-source", "linux", "backend", "frontend", "documentation"],
-      yearOfStudy: ["freshman", "sophomore", "junior", "senior", "graduate"],
-      studentEmailRequired: false,
-      githubRequired: true,
-      other: "The 2026 application period is expected to be closed by late June; this is best used for preparing early and matching skills to communities."
-    },
-    deadline: "2027-06-30T23:59:00.000Z",
-    link: "https://summer-ospp.ac.cn/",
-    tags: ["open-source", "mentorship", "student", "summer"],
-    value: "Mentored open-source project work and potential stipend"
-  }
+      studentStatus: definition.studentStatus ?? (studentProgram ? "preferred" : "not_required"),
+      country: definition.country ?? ["global"],
+      skillTags: definition.skillTags ?? definition.tags.slice(0, 4),
+      yearOfStudy: studentProgram ? studentYears : [],
+      minimumAge: definition.category === "hackathon" ? 13 : undefined,
+      studentEmailRequired: definition.studentEmailRequired ?? false,
+      githubRequired: definition.githubRequired ?? definition.category === "open_source_program",
+      other:
+        definition.other ??
+        "Eligibility, availability, and dates can vary by country, cohort, or current terms; confirm final details on the official page."
+    }
+  };
+}
+
+const definitions: SeedDefinition[] = [
+  { title: "Major League Hacking Hackathon Season", companyName: "Major League Hacking", category: "hackathon", description: "Student hackathons in the MLH global season, with beginner-friendly tracks and community support.", link: "https://mlh.io/seasons/2026/events", tags: ["hackathon", "mlh", "students", "community"], value: "Prizes, mentorship, and a global builder community", deadline: "2026-12-15T23:59:00.000Z", studentStatus: "preferred", popularity: 98 },
+  { title: "Hack the North", companyName: "Hack the North", category: "hackathon", description: "A large student hackathon bringing together university builders for an intensive project weekend.", link: "https://hackthenorth.com/", tags: ["hackathon", "students", "canada", "hardware"], value: "Student hackathon experience, workshops, and prizes", deadline: "2026-09-20T23:59:00.000Z", studentStatus: "required", country: ["Canada"], popularity: 97 },
+  { title: "TreeHacks", companyName: "Stanford TreeHacks", category: "hackathon", description: "A student hackathon focused on ambitious projects across software, hardware, and emerging technology.", link: "https://treehacks.com/", tags: ["hackathon", "students", "stanford", "innovation"], value: "Mentorship, demos, and project prizes", deadline: "2027-02-15T23:59:00.000Z", studentStatus: "required", popularity: 94 },
+  { title: "PennApps", companyName: "PennApps", category: "hackathon", description: "A student-run hackathon where teams build and present working prototypes over a weekend.", link: "https://pennapps.com/", tags: ["hackathon", "students", "web", "prototyping"], value: "Hackathon project sprint and community recognition", deadline: "2026-09-30T23:59:00.000Z", studentStatus: "required", country: ["United States"], popularity: 93 },
+  { title: "Cal Hacks", companyName: "Cal Hacks", category: "hackathon", description: "A major collegiate hackathon with software, hardware, social impact, and sponsor challenges.", link: "https://calhacks.io/", tags: ["hackathon", "students", "hardware", "ai"], value: "Workshops, sponsor prizes, and a student builder network", deadline: "2026-10-25T23:59:00.000Z", studentStatus: "required", popularity: 92 },
+  { title: "HackMIT", companyName: "HackMIT", category: "hackathon", description: "A student hackathon centered on creative technical projects, collaboration, and rapid prototyping.", link: "https://hackmit.org/", tags: ["hackathon", "students", "prototyping", "massachusetts"], value: "Mentorship, workshops, and project prizes", deadline: "2026-10-04T23:59:00.000Z", studentStatus: "required", country: ["United States"], popularity: 91 },
+  { title: "Hack the 6ix", companyName: "Hack the 6ix", category: "hackathon", description: "A Toronto student hackathon for building practical software and hardware projects with mentors.", link: "https://www.hackthe6ix.com/", tags: ["hackathon", "students", "toronto", "software"], value: "Project showcase, workshops, and prizes", deadline: "2026-08-30T23:59:00.000Z", studentStatus: "required", country: ["Canada"], popularity: 88 },
+  { title: "Junction Hackathon", companyName: "Junction", category: "hackathon", description: "A European hackathon with company challenges, APIs, and a collaborative project-building format.", link: "https://www.junction2026.com/", tags: ["hackathon", "europe", "apis", "ai"], value: "Company challenges, networking, and prizes", deadline: "2026-11-08T23:59:00.000Z", studentStatus: "preferred", country: ["Finland", "Europe"], popularity: 86 },
+  { title: "NASA International Space Apps Challenge", companyName: "NASA", category: "hackathon", description: "A global civic hackathon using open NASA data to solve challenges related to Earth and space.", link: "https://www.spaceappschallenge.org/", tags: ["hackathon", "nasa", "space", "open-data"], value: "Global showcase and space-data project experience", deadline: "2026-10-04T23:59:00.000Z", studentStatus: "not_required", popularity: 99 },
+  { title: "Global Game Jam", companyName: "Global Game Jam", category: "hackathon", description: "A worldwide game development jam where participants create a game around a shared theme.", link: "https://globalgamejam.org/", tags: ["hackathon", "games", "unity", "creative"], value: "Game prototype, collaboration, and global participation", deadline: "2027-02-01T23:59:00.000Z", popularity: 96 },
+  { title: "Lablab.ai Hackathons", companyName: "lablab.ai", category: "hackathon", description: "Online AI build events with prompts, workshops, and community challenges for shipping prototypes.", link: "https://lablab.ai/event", tags: ["hackathon", "ai", "llm", "online"], value: "AI prototype, workshops, and community feedback", popularity: 85 },
+  { title: "Devpost Hackathons", companyName: "Devpost", category: "hackathon", description: "A directory of current online and hybrid hackathons from technology companies, universities, and communities.", link: "https://devpost.com/hackathons", tags: ["hackathon", "devpost", "online", "projects"], value: "Project publication, prizes, and sponsor challenges", popularity: 100 },
+  { title: "ETHGlobal Hackathons", companyName: "ETHGlobal", category: "hackathon", description: "Global web3 hackathons with technical workshops, mentor support, and sponsor bounties.", link: "https://ethglobal.com/events", tags: ["hackathon", "web3", "ethereum", "blockchain"], value: "Bounties, workshops, and web3 project experience", popularity: 89 },
+  { title: "Microsoft Imagine Cup", companyName: "Microsoft", category: "hackathon", description: "A global student technology competition for teams creating solutions to meaningful problems.", link: "https://imaginecup.microsoft.com/", tags: ["competition", "students", "microsoft", "startup"], value: "Global competition, mentorship, and potential prizes", deadline: "2027-01-31T23:59:00.000Z", studentStatus: "required", popularity: 95 },
+  { title: "Google Solution Challenge", companyName: "Google Developer Student Clubs", category: "hackathon", description: "A student challenge to build solutions for UN Sustainable Development Goals using Google technology.", link: "https://developers.google.com/community/gdsc-solution-challenge", tags: ["competition", "students", "google", "social-impact"], value: "Project showcase and Google developer community recognition", deadline: "2027-03-31T23:59:00.000Z", studentStatus: "required", popularity: 94 },
+  { title: "Hack Club Hackathons", companyName: "Hack Club", category: "hackathon", description: "Student-led coding events and build challenges for young programmers and makers.", link: "https://hackclub.com/hackathons/", tags: ["hackathon", "students", "teenagers", "coding"], value: "Community, workshops, and hands-on project building", studentStatus: "required", minimumAge: 13, popularity: 90 },
+  { title: "NASA Lunabotics Junior Challenge", companyName: "NASA", category: "hackathon", description: "A NASA engineering challenge for students exploring lunar robotics and design concepts.", link: "https://www.nasa.gov/learning-resources/lunabotics-junior/", tags: ["challenge", "nasa", "robotics", "engineering"], value: "NASA learning experience and challenge recognition", deadline: "2027-03-01T23:59:00.000Z", studentStatus: "required", popularity: 81 },
+  { title: "AI for Good Hackathon", companyName: "UN AI for Good", category: "hackathon", description: "AI build challenges connected to social impact, sustainability, and responsible innovation.", link: "https://aiforgood.itu.int/", tags: ["hackathon", "ai", "social-impact", "sustainability"], value: "Responsible AI project experience and showcase", popularity: 84 },
+
+  { title: "Google AI Studio", companyName: "Google", category: "ai_free_trial", description: "Browser-based access to Gemini models for prompt experiments and AI application prototypes.", link: "https://aistudio.google.com/", tags: ["ai", "gemini", "prototyping", "api"], value: "Free model experimentation subject to current usage limits", popularity: 100 },
+  { title: "Google Gemini for Students", companyName: "Google", category: "ai_free_trial", description: "Student access offers for Gemini and related Google AI tools when available in eligible regions.", link: "https://gemini.google/students/", tags: ["ai", "gemini", "students", "productivity"], value: "Student AI plan or trial when available", studentStatus: "required", studentEmailRequired: true, popularity: 98 },
+  { title: "Microsoft Azure for Students", companyName: "Microsoft Azure", category: "ai_free_trial", description: "Student Azure access with credit for trying cloud services, including machine learning and AI tooling.", link: "https://azure.microsoft.com/free/students/", tags: ["ai", "azure", "cloud", "students"], value: "Azure student credit and access to AI services", studentStatus: "required", studentEmailRequired: true, popularity: 99 },
+  { title: "Amazon Bedrock Free Tier", companyName: "Amazon Web Services", category: "ai_free_trial", description: "AWS free-tier access for eligible new usage of selected foundation-model and cloud services.", link: "https://aws.amazon.com/bedrock/pricing/", tags: ["ai", "aws", "bedrock", "cloud"], value: "Limited free usage subject to AWS account and model terms", popularity: 93 },
+  { title: "Anthropic API Trial Credits", companyName: "Anthropic", category: "ai_free_trial", description: "New API users can check the current Anthropic console terms for any introductory credits or trial balance.", link: "https://www.anthropic.com/api", tags: ["ai", "claude", "api", "llm"], value: "Introductory API access when offered", other: "Availability and amount of introductory credits change; verify in the official console.", popularity: 95 },
+  { title: "OpenAI API New Account Credits", companyName: "OpenAI", category: "ai_free_trial", description: "Developers can check current OpenAI API account terms for any available starter credits or trial access.", link: "https://platform.openai.com/docs/overview", tags: ["ai", "openai", "api", "llm"], value: "API experimentation subject to current account terms", other: "Credit eligibility and amount are account-specific; verify current billing terms before use.", popularity: 100 },
+  { title: "Hugging Face Spaces", companyName: "Hugging Face", category: "ai_free_trial", description: "Host and share machine learning demos, model experiments, and Gradio applications with a free tier.", link: "https://huggingface.co/spaces", tags: ["ai", "hugging-face", "gradio", "open-source"], value: "Free public demo hosting and model community access", popularity: 92 },
+  { title: "Google Colab", companyName: "Google", category: "ai_free_trial", description: "Hosted Jupyter notebooks for experimenting with Python, data science, and machine learning.", link: "https://colab.research.google.com/", tags: ["ai", "python", "notebooks", "machine-learning"], value: "Hosted notebooks with free compute subject to limits", popularity: 99 },
+  { title: "Kaggle Notebooks and Models", companyName: "Kaggle", category: "ai_free_trial", description: "Free hosted notebooks, datasets, competitions, and model access for data science practice.", link: "https://www.kaggle.com/", tags: ["ai", "data-science", "python", "datasets"], value: "Free notebook compute and data science community access", popularity: 96 },
+  { title: "Replicate Demo Credits", companyName: "Replicate", category: "ai_free_trial", description: "Run open-source machine learning models through an API and check account onboarding terms for trial credit.", link: "https://replicate.com/", tags: ["ai", "models", "api", "computer-vision"], value: "Model API experimentation subject to current account terms", other: "Trial availability and pricing depend on the current Replicate account terms.", popularity: 86 },
+  { title: "GroqCloud Developer Access", companyName: "Groq", category: "ai_free_trial", description: "Fast inference API access for experimenting with supported open models and AI applications.", link: "https://console.groq.com/", tags: ["ai", "groq", "api", "llm"], value: "Developer API access subject to current rate limits", popularity: 90 },
+  { title: "Cohere Trial API", companyName: "Cohere", category: "ai_free_trial", description: "Developer API access for language, retrieval, and embedding experiments under Cohere trial terms.", link: "https://cohere.com/", tags: ["ai", "cohere", "embeddings", "api"], value: "Trial API usage for prototyping", other: "Confirm current trial quotas and commercial-use terms in the dashboard.", popularity: 82 },
+  { title: "Mistral AI La Plateforme", companyName: "Mistral AI", category: "ai_free_trial", description: "Experiment with Mistral models through a developer platform and API account.", link: "https://console.mistral.ai/", tags: ["ai", "mistral", "api", "llm"], value: "Developer experimentation subject to current platform terms", popularity: 88 },
+  { title: "Together AI Trial", companyName: "Together AI", category: "ai_free_trial", description: "Cloud inference and fine-tuning access for open models with account-level onboarding offers when available.", link: "https://www.together.ai/", tags: ["ai", "open-models", "inference", "api"], value: "Trial cloud inference when offered", other: "Credit availability changes; verify the current signup offer.", popularity: 84 },
+  { title: "Pika AI Video", companyName: "Pika", category: "ai_free_trial", description: "Create short AI-generated videos and effects through Pika's consumer product and available free tier.", link: "https://pika.art/", tags: ["ai", "video", "creative", "generative"], value: "Free-tier AI video generations subject to limits", popularity: 83 },
+  { title: "Runway Free Plan", companyName: "Runway", category: "ai_free_trial", description: "Try generative video and creative AI tools through Runway's free plan.", link: "https://runwayml.com/", tags: ["ai", "video", "creative", "generative"], value: "Free plan credits subject to current limits", popularity: 87 },
+  { title: "Perplexity Free Plan", companyName: "Perplexity", category: "ai_free_trial", description: "Research assistant with web-grounded answers and a free plan for trying AI search workflows.", link: "https://www.perplexity.ai/", tags: ["ai", "research", "search", "productivity"], value: "Free AI search access subject to current limits", popularity: 94 },
+  { title: "Stability AI Developer Platform", companyName: "Stability AI", category: "ai_free_trial", description: "Explore image generation APIs and tools with current developer onboarding options.", link: "https://platform.stability.ai/", tags: ["ai", "images", "api", "creative"], value: "Developer image generation access subject to current terms", popularity: 80 },
+
+  { title: "GitHub Student Developer Pack", companyName: "GitHub", category: "subscription_offer", description: "A verified student bundle with developer tools, learning resources, and partner offers.", link: "https://education.github.com/pack", tags: ["students", "github", "developer-tools", "education"], value: "Student access to a bundle of developer tools and services", studentStatus: "required", studentEmailRequired: true, githubRequired: true, popularity: 100 },
+  { title: "JetBrains Student Pack", companyName: "JetBrains", category: "subscription_offer", description: "Free educational licenses for JetBrains IDEs and developer tools for eligible students.", link: "https://www.jetbrains.com/community/education/", tags: ["students", "jetbrains", "ide", "developer-tools"], value: "Educational IDE licenses", studentStatus: "required", studentEmailRequired: true, popularity: 98 },
+  { title: "Notion for Education", companyName: "Notion", category: "subscription_offer", description: "Education plan options for students and educators using Notion for notes, projects, and collaboration.", link: "https://www.notion.so/product/notion-for-education", tags: ["students", "notion", "productivity", "education"], value: "Education workspace features when eligible", studentStatus: "required", studentEmailRequired: true, popularity: 95 },
+  { title: "Figma for Education", companyName: "Figma", category: "subscription_offer", description: "Free professional design and collaboration features for eligible students and educators.", link: "https://www.figma.com/education/", tags: ["students", "figma", "design", "collaboration"], value: "Education access to Figma design and prototyping tools", studentStatus: "required", studentEmailRequired: true, popularity: 97 },
+  { title: "Microsoft 365 Education", companyName: "Microsoft", category: "subscription_offer", description: "Eligible schools and students can access Microsoft 365 education plans and productivity apps.", link: "https://www.microsoft.com/education/products/office", tags: ["students", "microsoft", "office", "productivity"], value: "Education access to Microsoft productivity apps", studentStatus: "required", studentEmailRequired: true, popularity: 96 },
+  { title: "Canva for Education", companyName: "Canva", category: "subscription_offer", description: "Education plan for eligible students and teachers creating presentations, graphics, and media.", link: "https://www.canva.com/education/", tags: ["students", "canva", "design", "education"], value: "Education access to Canva design features", studentStatus: "required", studentEmailRequired: true, popularity: 94 },
+  { title: "Autodesk Education Plan", companyName: "Autodesk", category: "subscription_offer", description: "Free access to selected Autodesk professional design and engineering software for eligible students.", link: "https://www.autodesk.com/education/edu-software/overview", tags: ["students", "autodesk", "engineering", "design"], value: "Educational access to Autodesk software", studentStatus: "required", studentEmailRequired: true, popularity: 91 },
+  { title: "Unity Student Plan", companyName: "Unity", category: "subscription_offer", description: "Education resources and plan options for students learning real-time 3D and game development.", link: "https://unity.com/products/unity-student", tags: ["students", "unity", "games", "3d"], value: "Student access to Unity learning and development tools", studentStatus: "required", popularity: 90 },
+  { title: "Adobe Creative Cloud Student Discount", companyName: "Adobe", category: "subscription_offer", description: "Student pricing for Adobe creative applications and services, subject to current regional terms.", link: "https://www.adobe.com/creativecloud/buy/students.html", tags: ["students", "adobe", "design", "creative"], value: "Reduced student pricing for Creative Cloud", studentStatus: "required", studentEmailRequired: true, popularity: 93 },
+  { title: "Perplexity Pro Student Offer", companyName: "Perplexity", category: "subscription_offer", description: "Student pricing or promotional access for Perplexity Pro when the current offer is available.", link: "https://www.perplexity.ai/pro", tags: ["students", "ai", "research", "perplexity"], value: "Student AI research subscription offer when available", studentStatus: "required", studentEmailRequired: true, other: "Student promotions are time-limited and region-specific; verify the current offer before subscribing.", popularity: 97 },
+  { title: "Spotify Premium Student", companyName: "Spotify", category: "subscription_offer", description: "Reduced Premium pricing for eligible higher-education students in supported markets.", link: "https://www.spotify.com/student/", tags: ["students", "spotify", "discount", "subscription"], value: "Student discount on Spotify Premium", studentStatus: "required", popularity: 96 },
+  { title: "YouTube Premium Student", companyName: "YouTube", category: "subscription_offer", description: "Student pricing for YouTube Premium in supported countries after student verification.", link: "https://www.youtube.com/premium/student", tags: ["students", "youtube", "discount", "subscription"], value: "Student discount on YouTube Premium", studentStatus: "required", popularity: 94 },
+  { title: "Amazon Prime Student", companyName: "Amazon", category: "subscription_offer", description: "Student membership pricing and trial benefits where Amazon offers the program.", link: "https://www.amazon.com/prime/student", tags: ["students", "amazon", "discount", "shopping"], value: "Student membership trial or discount by market", studentStatus: "required", popularity: 92 },
+  { title: "Grammarly for Students", companyName: "Grammarly", category: "subscription_offer", description: "Writing assistant plans and student discounts that may be available through current Grammarly offers.", link: "https://www.grammarly.com/edu", tags: ["students", "writing", "productivity", "education"], value: "Student writing assistance offer when eligible", studentStatus: "required", popularity: 83 },
+  { title: "Evernote Personal Student Discount", companyName: "Evernote", category: "subscription_offer", description: "Student pricing or promotions for Evernote note-taking plans when offered in the user's market.", link: "https://evernote.com/", tags: ["students", "notes", "productivity", "discount"], value: "Student subscription discount when available", studentStatus: "required", popularity: 78 },
+  { title: "GitKraken Student Pack", companyName: "GitKraken", category: "subscription_offer", description: "Educational access options for GitKraken Git clients and developer collaboration tools.", link: "https://www.gitkraken.com/students", tags: ["students", "git", "developer-tools", "github"], value: "Student access to GitKraken tools", studentStatus: "required", popularity: 80 },
+  { title: "1Password Student Offer", companyName: "1Password", category: "subscription_offer", description: "Student pricing or campus offers for password management when available in the current program.", link: "https://1password.com/education", tags: ["students", "security", "passwords", "privacy"], value: "Student password-manager offer when available", studentStatus: "required", popularity: 79 },
+
+  { title: "Google Cloud for Students", companyName: "Google Cloud", category: "student_program", description: "Student learning resources, cloud credits, and education pathways for learning Google Cloud.", link: "https://cloud.google.com/edu/students", tags: ["students", "google-cloud", "cloud", "learning"], value: "Cloud learning resources and possible credits", studentStatus: "required", studentEmailRequired: true, popularity: 99 },
+  { title: "AWS Educate", companyName: "Amazon Web Services", category: "student_program", description: "Free cloud learning, labs, and foundational AWS content for students and educators.", link: "https://aws.amazon.com/education/awseducate/", tags: ["students", "aws", "cloud", "learning"], value: "Cloud learning pathways and hands-on labs", studentStatus: "required", popularity: 98 },
+  { title: "Microsoft Learn Student Hub", companyName: "Microsoft", category: "student_program", description: "Student learning paths, events, and resources for cloud, AI, data, and software development.", link: "https://learn.microsoft.com/training/student-hub/", tags: ["students", "microsoft", "learning", "azure"], value: "Free technical learning and cloud skill pathways", studentStatus: "required", popularity: 94 },
+  { title: "Google Developer Student Clubs", companyName: "Google", category: "student_program", description: "Campus-based developer communities that help students learn and build with Google technologies.", link: "https://developers.google.com/community/gdsc", tags: ["students", "google", "community", "developers"], value: "Peer learning, events, and developer community experience", studentStatus: "required", popularity: 96 },
+  { title: "MLH Fellowship", companyName: "Major League Hacking", category: "student_program", description: "A remote software engineering fellowship with open-source projects, mentorship, and community.", link: "https://fellowship.mlh.io/", tags: ["students", "fellowship", "open-source", "software"], value: "Mentorship, project experience, and community", deadline: "2027-01-15T23:59:00.000Z", studentStatus: "preferred", githubRequired: true, popularity: 95 },
+  { title: "Microsoft Explore", companyName: "Microsoft", category: "student_program", description: "An early-career software engineering internship pathway for students, subject to current recruiting cycles.", link: "https://careers.microsoft.com/v2/global/en/students", tags: ["students", "internship", "software", "microsoft"], value: "Early-career software engineering experience", deadline: "2026-11-30T23:59:00.000Z", studentStatus: "required", popularity: 91 },
+  { title: "Google Summer Internship Programs", companyName: "Google", category: "student_program", description: "Google student opportunities across software engineering, research, product, and related disciplines.", link: "https://buildyourfuture.withgoogle.com/", tags: ["students", "internship", "software", "google"], value: "Internship and early-career development opportunities", deadline: "2026-12-15T23:59:00.000Z", studentStatus: "required", popularity: 98 },
+  { title: "Meta University and Student Programs", companyName: "Meta", category: "student_program", description: "Student and early-career pathways at Meta, with availability depending on region and recruiting cycle.", link: "https://www.metacareers.com/careerprograms/students", tags: ["students", "internship", "software", "meta"], value: "Early-career learning and internship pathways", deadline: "2026-12-31T23:59:00.000Z", studentStatus: "required", popularity: 93 },
+  { title: "NVIDIA Student Programs", companyName: "NVIDIA", category: "student_program", description: "Student internships, research, and developer opportunities in accelerated computing and AI.", link: "https://www.nvidia.com/en-us/about-nvidia/careers/students/", tags: ["students", "ai", "gpu", "internship"], value: "AI and accelerated-computing student opportunities", deadline: "2026-12-31T23:59:00.000Z", studentStatus: "required", popularity: 92 },
+  { title: "IBM SkillsBuild", companyName: "IBM", category: "student_program", description: "Free learning pathways, credentials, and career resources across AI, cloud, data, and cybersecurity.", link: "https://skillsbuild.org/", tags: ["students", "ibm", "ai", "learning"], value: "Free learning pathways and digital credentials", studentStatus: "preferred", popularity: 89 },
+  { title: "Cisco Networking Academy", companyName: "Cisco", category: "student_program", description: "Online courses and partner-led learning for networking, cybersecurity, programming, and IT skills.", link: "https://www.netacad.com/", tags: ["students", "networking", "cybersecurity", "learning"], value: "Technical courses and career preparation", studentStatus: "preferred", popularity: 91 },
+  { title: "Salesforce Trailhead Student Resources", companyName: "Salesforce", category: "student_program", description: "Hands-on Trailhead learning and career resources for students exploring Salesforce technologies.", link: "https://trailhead.salesforce.com/", tags: ["students", "salesforce", "cloud", "learning"], value: "Interactive learning and Salesforce skill development", studentStatus: "preferred", popularity: 84 },
+  { title: "Oracle Academy", companyName: "Oracle", category: "student_program", description: "Education resources and curriculum support for database, Java, cloud, and computing skills.", link: "https://academy.oracle.com/", tags: ["students", "oracle", "java", "databases"], value: "Technical curriculum and learning resources", studentStatus: "required", popularity: 82 },
+  { title: "GitHub Campus Experts", companyName: "GitHub", category: "student_program", description: "A community leadership program for students running technical communities on campus.", link: "https://education.github.com/experts", tags: ["students", "github", "community", "leadership"], value: "Community leadership training and GitHub network", studentStatus: "required", githubRequired: true, popularity: 87 },
+  { title: "Recurse", companyName: "Recurse", category: "student_program", description: "A peer-driven coding community and learning environment for developers building software skills.", link: "https://www.recurse.com/", tags: ["community", "coding", "software", "learning"], value: "Peer learning, projects, and a developer network", studentStatus: "preferred", popularity: 85 },
+  { title: "CodePath", companyName: "CodePath", category: "student_program", description: "Industry-aligned technical courses and career support for college students.", link: "https://www.codepath.org/", tags: ["students", "coding", "career", "software"], value: "Technical courses, projects, and career preparation", studentStatus: "required", popularity: 90 },
+  { title: "Out in Tech Digital Corps", companyName: "Out in Tech", category: "student_program", description: "Volunteer and community opportunities for LGBTQ+ tech professionals and allies supporting digital projects.", link: "https://outintech.com/digital-corps/", tags: ["community", "web", "social-impact", "volunteer"], value: "Mentored civic technology project experience", studentStatus: "not_required", popularity: 75 },
+
+  { title: "AWS Certified Cloud Practitioner", companyName: "Amazon Web Services", category: "certification", description: "Foundational AWS certification for understanding cloud concepts, services, security, and pricing.", link: "https://aws.amazon.com/certification/certified-cloud-practitioner/", tags: ["certification", "aws", "cloud", "beginner"], value: "Recognized foundational cloud credential", popularity: 98 },
+  { title: "AWS Certified AI Practitioner", companyName: "Amazon Web Services", category: "certification", description: "Foundational credential covering practical AI and machine learning concepts on AWS.", link: "https://aws.amazon.com/certification/certified-ai-practitioner/", tags: ["certification", "aws", "ai", "cloud"], value: "Foundational AI and cloud credential", popularity: 93 },
+  { title: "Microsoft Azure Fundamentals AZ-900", companyName: "Microsoft", category: "certification", description: "Entry-level certification covering cloud concepts and core Azure services.", link: "https://learn.microsoft.com/credentials/certifications/azure-fundamentals/", tags: ["certification", "azure", "cloud", "beginner"], value: "Recognized Azure fundamentals credential", popularity: 97 },
+  { title: "Microsoft Azure AI Fundamentals AI-900", companyName: "Microsoft", category: "certification", description: "Foundational certification for machine learning and AI concepts on Azure.", link: "https://learn.microsoft.com/credentials/certifications/azure-ai-fundamentals/", tags: ["certification", "azure", "ai", "machine-learning"], value: "Foundational Azure AI credential", popularity: 94 },
+  { title: "Google Cloud Digital Leader", companyName: "Google Cloud", category: "certification", description: "Foundational Google Cloud credential focused on cloud concepts and business value.", link: "https://cloud.google.com/learn/certification/cloud-digital-leader", tags: ["certification", "google-cloud", "cloud", "beginner"], value: "Foundational Google Cloud credential", popularity: 92 },
+  { title: "Associate Cloud Engineer", companyName: "Google Cloud", category: "certification", description: "Google Cloud certification for deploying, managing, and operating cloud solutions.", link: "https://cloud.google.com/learn/certification/cloud-engineer", tags: ["certification", "google-cloud", "cloud", "devops"], value: "Professional cloud engineering credential", popularity: 91 },
+  { title: "TensorFlow Developer Certificate", companyName: "TensorFlow", category: "certification", description: "A TensorFlow-focused developer assessment and learning pathway for practical machine learning skills.", link: "https://www.tensorflow.org/certificate", tags: ["certification", "tensorflow", "python", "machine-learning"], value: "Machine learning development credential or pathway", other: "Check the official page for current exam availability and enrollment status.", popularity: 89 },
+  { title: "Oracle Certified Professional Java", companyName: "Oracle", category: "certification", description: "Professional Java certification path for developers demonstrating Java programming knowledge.", link: "https://education.oracle.com/java-certification", tags: ["certification", "java", "backend", "oracle"], value: "Professional Java credential", popularity: 90 },
+  { title: "Cisco Certified Support Technician Cybersecurity", companyName: "Cisco", category: "certification", description: "Entry-level cybersecurity credential for learners building foundational security knowledge.", link: "https://www.cisco.com/site/us/en/learn/training-certifications/certifications/entry/certifications.html", tags: ["certification", "cybersecurity", "networking", "beginner"], value: "Entry-level cybersecurity credential", popularity: 83 },
+  { title: "CompTIA A+", companyName: "CompTIA", category: "certification", description: "Industry-recognized entry-level IT certification covering hardware, software, and troubleshooting.", link: "https://www.comptia.org/certifications/a", tags: ["certification", "it", "hardware", "beginner"], value: "Entry-level IT support credential", popularity: 95 },
+  { title: "CompTIA Network+", companyName: "CompTIA", category: "certification", description: "Vendor-neutral networking certification covering connectivity, operations, and troubleshooting.", link: "https://www.comptia.org/certifications/network", tags: ["certification", "networking", "it", "infrastructure"], value: "Vendor-neutral networking credential", popularity: 91 },
+  { title: "CompTIA Security+", companyName: "CompTIA", category: "certification", description: "Foundational cybersecurity certification covering threats, architecture, operations, and risk.", link: "https://www.comptia.org/certifications/security", tags: ["certification", "cybersecurity", "security", "it"], value: "Foundational cybersecurity credential", popularity: 98 },
+  { title: "Linux Foundation Certified IT Associate", companyName: "Linux Foundation", category: "certification", description: "Entry-level credential covering Linux, cloud, DevOps, and open-source fundamentals.", link: "https://training.linuxfoundation.org/certification/certified-it-associate/", tags: ["certification", "linux", "cloud", "devops"], value: "Open-source and Linux fundamentals credential", popularity: 86 },
+  { title: "Certified Kubernetes Application Developer", companyName: "Cloud Native Computing Foundation", category: "certification", description: "Hands-on certification for designing and deploying cloud-native applications on Kubernetes.", link: "https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/", tags: ["certification", "kubernetes", "cloud-native", "devops"], value: "Cloud-native developer credential", popularity: 94 },
+  { title: "Cisco Certified Network Associate", companyName: "Cisco", category: "certification", description: "Networking certification covering network fundamentals, access, IP connectivity, and automation basics.", link: "https://www.cisco.com/site/us/en/learn/training-certifications/certifications/associate/ccna.html", tags: ["certification", "cisco", "networking", "automation"], value: "Associate networking credential", popularity: 96 },
+  { title: "Meta Front-End Developer Certificate", companyName: "Meta", category: "certification", description: "Coursera professional certificate pathway covering HTML, CSS, JavaScript, React, and portfolio work.", link: "https://www.coursera.org/professional-certificates/meta-front-end-developer", tags: ["certification", "frontend", "javascript", "react"], value: "Portfolio-oriented front-end certificate pathway", popularity: 92 },
+  { title: "IBM Data Science Professional Certificate", companyName: "IBM", category: "certification", description: "Coursera certificate pathway covering Python, SQL, data analysis, visualization, and machine learning basics.", link: "https://www.coursera.org/professional-certificates/ibm-data-science", tags: ["certification", "data-science", "python", "sql"], value: "Data science certificate pathway", popularity: 93 },
+  { title: "Google Cybersecurity Professional Certificate", companyName: "Google", category: "certification", description: "Entry-level professional certificate covering security operations, Linux, SQL, and incident response basics.", link: "https://grow.google/certificates/cybersecurity/", tags: ["certification", "cybersecurity", "linux", "sql"], value: "Entry-level cybersecurity certificate pathway", popularity: 94 },
+
+  { title: "Google Summer of Code", companyName: "Google", category: "open_source_program", description: "A global program where contributors work with open-source organizations under mentor guidance.", link: "https://summerofcode.withgoogle.com/", tags: ["open-source", "gsoc", "mentorship", "students"], value: "Mentored open-source project and stipend opportunity", deadline: "2027-03-31T18:00:00.000Z", studentStatus: "preferred", githubRequired: true, popularity: 100 },
+  { title: "Outreachy", companyName: "Outreachy", category: "open_source_program", description: "Paid remote internships supporting people subject to systemic bias and underrepresentation in tech.", link: "https://www.outreachy.org/", tags: ["open-source", "internship", "remote", "diversity"], value: "Paid remote open-source internship and mentorship", deadline: "2026-08-31T23:59:00.000Z", studentStatus: "not_required", githubRequired: true, other: "Applicants must meet Outreachy eligibility rules, including availability and underrepresentation criteria.", popularity: 99 },
+  { title: "Linux Foundation Mentorship", companyName: "Linux Foundation", category: "open_source_program", description: "Mentorship opportunities across Linux Foundation projects for contributors building open-source skills.", link: "https://mentorship.lfx.linuxfoundation.org/", tags: ["open-source", "linux", "mentorship", "devops"], value: "Mentored contribution experience across foundation projects", studentStatus: "not_required", popularity: 93 },
+  { title: "Season of KDE", companyName: "KDE", category: "open_source_program", description: "KDE mentorship for contributors working on software, design, documentation, and outreach.", link: "https://season.kde.org/", tags: ["open-source", "kde", "qt", "mentorship"], value: "Mentorship and recognized KDE contribution experience", studentStatus: "not_required", popularity: 82 },
+  { title: "Google Summer of Code Organization Explorer", companyName: "Google", category: "open_source_program", description: "A community tool for discovering GSoC organizations and project areas by technology.", link: "https://www.gsocorganizations.dev/", tags: ["open-source", "gsoc", "research", "organizations"], value: "Discovery path for matching skills to open-source communities", studentStatus: "not_required", popularity: 86 },
+  { title: "Open Source Promotion Plan", companyName: "Open Source Promotion Plan", category: "open_source_program", description: "A mentorship program connecting contributors with open-source projects for seasonal project work.", link: "https://summer-ospp.ac.cn/", tags: ["open-source", "mentorship", "students", "summer"], value: "Mentored open-source project work and potential stipend", deadline: "2027-06-30T23:59:00.000Z", studentStatus: "preferred", githubRequired: true, popularity: 88 },
+  { title: "Outreach Mozilla", companyName: "Mozilla", category: "open_source_program", description: "Mozilla community contribution opportunities across Firefox, web platform, privacy, and documentation.", link: "https://www.mozilla.org/contribute/", tags: ["open-source", "mozilla", "web", "privacy"], value: "Open-source contribution and community experience", studentStatus: "not_required", popularity: 90 },
+  { title: "First Contributions", companyName: "First Contributions", category: "open_source_program", description: "A beginner-friendly project for learning the pull-request workflow through a first open-source contribution.", link: "https://firstcontributions.github.io/", tags: ["open-source", "github", "git", "beginners"], value: "Low-barrier first contribution experience", studentStatus: "not_required", popularity: 97 },
+  { title: "Hacktoberfest", companyName: "DigitalOcean", category: "open_source_program", description: "An annual open-source participation event encouraging contributors to make quality pull requests.", link: "https://hacktoberfest.com/", tags: ["open-source", "hacktoberfest", "github", "community"], value: "Open-source contribution challenge and community recognition", deadline: "2026-10-31T23:59:00.000Z", studentStatus: "not_required", githubRequired: true, popularity: 100 },
+  { title: "24 Pull Requests", companyName: "24 Pull Requests", category: "open_source_program", description: "A seasonal challenge encouraging contributors to make open-source pull requests during December.", link: "https://24pullrequests.com/", tags: ["open-source", "github", "git", "community"], value: "Contribution habit-building and community participation", deadline: "2026-12-24T23:59:00.000Z", studentStatus: "not_required", githubRequired: true, popularity: 88 },
+  { title: "AsyncAPI Mentorship", companyName: "AsyncAPI", category: "open_source_program", description: "Community contribution and mentorship opportunities around event-driven API specifications and tooling.", link: "https://www.asyncapi.com/community", tags: ["open-source", "apis", "javascript", "community"], value: "Open-source API tooling experience and mentorship", studentStatus: "not_required", githubRequired: true, popularity: 76 },
+  { title: "CNCF Mentoring Programs", companyName: "Cloud Native Computing Foundation", category: "open_source_program", description: "Cloud-native mentorship and contribution programs spanning Kubernetes and related projects.", link: "https://github.com/cncf/mentoring", tags: ["open-source", "kubernetes", "cloud-native", "mentorship"], value: "Mentored cloud-native contribution experience", studentStatus: "preferred", githubRequired: true, popularity: 94 },
+  { title: "Apache Software Foundation Community", companyName: "Apache Software Foundation", category: "open_source_program", description: "Contributor pathways across Apache projects, from documentation and testing to code.", link: "https://community.apache.org/", tags: ["open-source", "apache", "java", "community"], value: "Large-scale open-source contribution experience", studentStatus: "not_required", githubRequired: true, popularity: 92 },
+  { title: "GNOME Internship Program", companyName: "GNOME Foundation", category: "open_source_program", description: "Seasonal internships and contribution opportunities across the GNOME desktop and accessibility ecosystem.", link: "https://foundation.gnome.org/internship/", tags: ["open-source", "gnome", "linux", "internship"], value: "Mentored desktop open-source project experience", deadline: "2027-03-01T23:59:00.000Z", studentStatus: "preferred", githubRequired: true, popularity: 84 },
+  { title: "OpenJS Foundation Mentorship", companyName: "OpenJS Foundation", category: "open_source_program", description: "Mentorship and contributor pathways across Node.js and JavaScript ecosystem projects.", link: "https://openjsf.org/collaboration/mentorship/", tags: ["open-source", "javascript", "nodejs", "mentorship"], value: "Mentored JavaScript ecosystem contribution experience", studentStatus: "preferred", githubRequired: true, popularity: 91 },
+  { title: "Rust Foundation Grants and Community", companyName: "Rust Foundation", category: "open_source_program", description: "Community pathways and contribution resources for developers building with and around Rust.", link: "https://foundation.rust-lang.org/grants/", tags: ["open-source", "rust", "systems", "community"], value: "Rust ecosystem contribution and community support", studentStatus: "not_required", githubRequired: true, popularity: 86 },
+  { title: "The Linux Kernel New Contributors", companyName: "Linux Kernel", category: "open_source_program", description: "Guidance and community resources for developers learning to contribute to the Linux kernel.", link: "https://kernelnewbies.org/FirstKernelPatch", tags: ["open-source", "linux", "c", "systems"], value: "Systems programming contribution experience", studentStatus: "not_required", githubRequired: false, popularity: 89 },
+  { title: "Wikimedia Technical Contributions", companyName: "Wikimedia Foundation", category: "open_source_program", description: "Open-source contribution pathways across MediaWiki, Wikimedia tools, and community infrastructure.", link: "https://www.mediawiki.org/wiki/How_to_become_a_MediaWiki_hacker", tags: ["open-source", "mediawiki", "php", "community"], value: "Public-interest open-source contribution experience", studentStatus: "not_required", githubRequired: true, popularity: 87 },
+  { title: "NumFOCUS Small Development Grants", companyName: "NumFOCUS", category: "open_source_program", description: "Support and contribution opportunities for open-source scientific Python and data tools.", link: "https://numfocus.org/programs/small-development-grants", tags: ["open-source", "python", "data-science", "science"], value: "Support for open-source scientific software work", studentStatus: "not_required", githubRequired: true, popularity: 79 }
 ];
+
+export const seedOpportunities = definitions.map(defineOpportunity);

@@ -57,6 +57,12 @@ const opportunitySchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    companyName: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true
+    },
     category: {
       type: String,
       enum: categories,
@@ -91,6 +97,12 @@ const opportunitySchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true
+    },
+    popularity: {
+      type: Number,
+      default: 0,
+      min: 0,
+      index: true
     }
   },
   {
