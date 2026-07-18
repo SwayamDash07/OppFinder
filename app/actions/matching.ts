@@ -12,6 +12,7 @@ import { OpportunityModel } from "@/lib/models/opportunity";
 import type { UserProfile } from "@/lib/profile";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getCurrentProfile } from "@/lib/server-session";
+import { getCachedGitHubSignal, mergeGitHubSignal } from "@/lib/github";
 
 export type EnrichedEligibilityMatch = Awaited<
   ReturnType<typeof matchOpportunitiesForProfile>
@@ -47,9 +48,12 @@ export type CoreMatchingActionState =
     };
 
 export async function runCoreEligibilityMatching(): Promise<CoreMatchingActionState> {
-  const profile = await getCurrentProfile();
+  const [account, profile] = await Promise.all([
+    getCurrentAccount(),
+    getCurrentProfile()
+  ]);
 
-  if (!profile) {
+  if (!account || !profile) {
     return {
       ok: false,
       error: "Save your profile before running eligibility matching."
@@ -57,8 +61,9 @@ export async function runCoreEligibilityMatching(): Promise<CoreMatchingActionSt
   }
 
   try {
+    const enrichedProfile = await enrichProfileForMatching(account.id, profile);
     const opportunities = await loadOpportunities();
-    const result = await matchOpportunitiesForProfile(profile, opportunities);
+    const result = await matchOpportunitiesForProfile(enrichedProfile, opportunities);
 
     return {
       ok: true,
@@ -122,6 +127,7 @@ export async function runEligibilityMatching(): Promise<MatchingActionState> {
     };
   }
 
+  const enrichedProfile = await enrichProfileForMatching(account.id, profile);
   const profileKey = getProfileKey(account.id, profile);
   const cachedResult = await getCachedMatchResult(profileKey);
   let result: Awaited<ReturnType<typeof matchOpportunitiesForProfile>>;
@@ -136,7 +142,7 @@ export async function runEligibilityMatching(): Promise<MatchingActionState> {
     cacheStatus = "hit";
   } else {
     try {
-      result = await matchOpportunitiesForProfile(profile, opportunities);
+      result = await matchOpportunitiesForProfile(enrichedProfile, opportunities);
       await cacheMatchResult(profileKey, result);
     } catch (error) {
       console.error("Eligibility matching failed", error);
@@ -255,7 +261,8 @@ async function runEligibilityMatchingWithRefresh(): Promise<MatchingActionState>
   }
 
   try {
-    const result = await matchOpportunitiesForProfile(profile, opportunities);
+    const enrichedProfile = await enrichProfileForMatching(account.id, profile);
+    const result = await matchOpportunitiesForProfile(enrichedProfile, opportunities);
     const profileKey = getProfileKey(account.id, profile);
     await cacheMatchResult(profileKey, result);
     const opportunitiesById = new Map(
@@ -277,6 +284,15 @@ async function runEligibilityMatchingWithRefresh(): Promise<MatchingActionState>
       error: "Eligibility matching could not run right now."
     };
   }
+}
+
+async function enrichProfileForMatching(accountId: string, profile: UserProfile) {
+  if (!profile.githubUsername) {
+    return profile;
+  }
+
+  const signal = await getCachedGitHubSignal(accountId, profile.githubUsername);
+  return mergeGitHubSignal(profile, signal);
 }
 
 async function loadOpportunities(): Promise<MatchableOpportunity[]> {

@@ -511,12 +511,44 @@ textarea {
   font-weight: 750;
 }
 
+.field small.field-hint {
+  color: var(--text-muted);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .form-message {
   margin: 14px 0 0;
 }
 
 .profile-form .button {
   margin-top: 18px;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--border);
+}
+
+.button--github {
+  width: 100%;
+  margin-top: 12px;
+  background: #24292f;
+  color: #fff;
 }
 
 .profile-form .button:disabled {

@@ -10,6 +10,7 @@ const sessionMaxAgeSeconds = 60 * 60 * 24 * 7;
 export type CurrentAccount = {
   id: string;
   email: string;
+  githubUsername?: string;
 };
 
 export function normalizeEmail(value: FormDataEntryValue | null) {
@@ -107,6 +108,7 @@ export async function getCurrentAccount(): Promise<CurrentAccount | null> {
   const account = await UserAccountModel.findById(session.userId).lean<{
     _id: { toString(): string };
     email: string;
+    githubUsername?: string;
   }>();
 
   if (!account) {
@@ -115,7 +117,8 @@ export async function getCurrentAccount(): Promise<CurrentAccount | null> {
 
   return {
     id: account._id.toString(),
-    email: account.email
+    email: account.email,
+    githubUsername: account.githubUsername
   };
 }
 

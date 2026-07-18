@@ -37,6 +37,8 @@ export type UserProfile = {
   interests: string[];
   githubUsername?: string;
   studentEmailDomain?: string;
+  githubActivity?: "active" | "dormant" | "no_public_repos";
+  githubRepositoryCount?: number;
 };
 
 export type ProfileFormState = {
@@ -133,16 +135,8 @@ export function validateProfileForm(formData: FormData): {
     errors.country = "Enter a valid country name.";
   }
 
-  if (skills.length === 0) {
-    errors.skills = "Add at least one skill.";
-  }
-
   if (skills.some((skill) => skill.length > 32)) {
     errors.skills = "Keep each skill under 32 characters.";
-  }
-
-  if (interests.length === 0) {
-    errors.interests = "Add at least one interest.";
   }
 
   if (interests.some((interest) => interest.length > 32)) {
@@ -154,6 +148,18 @@ export function validateProfileForm(formData: FormData): {
     !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(values.githubUsername)
   ) {
     errors.githubUsername = "Enter a valid GitHub username.";
+  }
+
+  const hasValidGitHubUsername = Boolean(
+    values.githubUsername && !errors.githubUsername
+  );
+
+  if (skills.length === 0 && !hasValidGitHubUsername) {
+    errors.skills = "Add at least one skill or a valid GitHub username.";
+  }
+
+  if (interests.length === 0 && !hasValidGitHubUsername) {
+    errors.interests = "Add at least one interest or a valid GitHub username.";
   }
 
   if (values.studentEmailDomain) {

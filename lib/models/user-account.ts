@@ -13,6 +13,11 @@ const userAccountSchema = new Schema(
     passwordHash: {
       type: String,
       required: true
+    },
+    githubUsername: {
+      type: String,
+      trim: true,
+      index: true
     }
   },
   {

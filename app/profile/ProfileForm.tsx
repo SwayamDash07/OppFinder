@@ -7,6 +7,7 @@ import { type ProfileFormState, roles, yearsOfStudy } from "@/lib/profile";
 type ProfileFormProps = {
   initialState: ProfileFormState;
   returnTo?: string;
+  githubUsername?: string;
 };
 
 const roleLabels = {
@@ -24,7 +25,7 @@ const yearLabels = {
   "not-applicable": "Not applicable"
 };
 
-export function ProfileForm({ initialState, returnTo }: ProfileFormProps) {
+export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileFormProps) {
   const [state, formAction, isPending] = useActionState(saveProfile, initialState);
 
   return (
@@ -114,16 +115,23 @@ export function ProfileForm({ initialState, returnTo }: ProfileFormProps) {
           <p>Optional signals that unlock student-only opportunities.</p>
         </div>
         <div className="form-grid">
-          <label className="field">
-            <span>GitHub username</span>
-            <input
-              name="githubUsername"
-              defaultValue={state.values.githubUsername}
-              placeholder="octocat"
-              aria-invalid={!!state.errors.githubUsername}
-            />
-            {state.errors.githubUsername ? <small>{state.errors.githubUsername}</small> : null}
-          </label>
+          {githubUsername ? (
+            <input name="githubUsername" type="hidden" value={githubUsername} />
+          ) : (
+            <label className="field">
+              <span>GitHub username</span>
+              <input
+                name="githubUsername"
+                defaultValue={state.values.githubUsername}
+                placeholder="octocat"
+                aria-invalid={!!state.errors.githubUsername}
+              />
+              <small className="field-hint">
+                We use your public repos to improve matches - no private data or write access.
+              </small>
+              {state.errors.githubUsername ? <small>{state.errors.githubUsername}</small> : null}
+            </label>
+          )}
 
           <label className="field">
             <span>Student email domain</span>

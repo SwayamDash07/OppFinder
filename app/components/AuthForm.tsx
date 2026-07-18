@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { login, signup, type AuthFormState } from "@/app/actions/auth";
+import { GitHubSignInButton } from "@/app/components/GitHubSignInButton";
 
 type AuthFormProps = {
   mode: "login" | "signup";
@@ -72,6 +73,8 @@ export function AuthForm({ mode }: AuthFormProps) {
           {mode === "login" ? "Create account" : "Already have an account"}
         </Link>
       </div>
+      <div className="auth-divider" aria-hidden="true"><span>or</span></div>
+      <GitHubSignInButton />
     </form>
   );
 }

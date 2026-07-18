@@ -77,7 +77,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       ) : null}
 
       <div className="profile-layout profile-layout--settings">
-        <ProfileForm initialState={initialState} returnTo={isEditing ? "/matches" : undefined} />
+        <ProfileForm
+          initialState={initialState}
+          returnTo={isEditing ? "/matches" : undefined}
+          githubUsername={account.githubUsername}
+        />
 
         <aside className="profile-summary" aria-label="Profile overview">
           <h2>{isEditing ? "Signed in as" : "Account"}</h2>

@@ -1,6 +1,23 @@
 import mongoose, { Schema, model, models, type InferSchemaType } from "mongoose";
 import { roles, yearsOfStudy } from "@/lib/profile";
 
+const githubSignalSchema = new Schema(
+  {
+    username: String,
+    repositoryCount: Number,
+    languages: [String],
+    topics: [String],
+    recentRepositories: [String],
+    lastPushedAt: Date,
+    activity: {
+      type: String,
+      enum: ["active", "dormant", "no_public_repos"]
+    },
+    fetchedAt: Date
+  },
+  { _id: false }
+);
+
 const userProfileSchema = new Schema(
   {
     userId: {
@@ -40,6 +57,9 @@ const userProfileSchema = new Schema(
       type: String,
       trim: true,
       index: true
+    },
+    githubSignal: {
+      type: githubSignalSchema
     }
   },
   {
