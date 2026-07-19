@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { saveProfile } from "@/app/actions/profile";
 import { type ProfileFormState, roles, yearsOfStudy } from "@/lib/profile";
 
@@ -27,6 +27,7 @@ const yearLabels = {
 
 export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileFormProps) {
   const [state, formAction, isPending] = useActionState(saveProfile, initialState);
+  const [role, setRole] = useState(initialState.values.role);
 
   return (
     <form className="profile-form" action={formAction}>
@@ -40,7 +41,12 @@ export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileF
         <div className="form-grid">
           <label className="field">
             <span>Role</span>
-            <select name="role" defaultValue={state.values.role} aria-invalid={!!state.errors.role}>
+            <select
+              name="role"
+              value={role}
+              onChange={(event) => setRole(event.target.value)}
+              aria-invalid={!!state.errors.role}
+            >
               {roles.map((role) => (
                 <option key={role} value={role}>
                   {roleLabels[role]}
@@ -50,21 +56,23 @@ export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileF
             {state.errors.role ? <small>{state.errors.role}</small> : null}
           </label>
 
-          <label className="field">
-            <span>Year of study</span>
-            <select
-              name="yearOfStudy"
-              defaultValue={state.values.yearOfStudy}
-              aria-invalid={!!state.errors.yearOfStudy}
-            >
-              {yearsOfStudy.map((year) => (
-                <option key={year} value={year}>
-                  {yearLabels[year]}
-                </option>
-              ))}
-            </select>
-            {state.errors.yearOfStudy ? <small>{state.errors.yearOfStudy}</small> : null}
-          </label>
+          {role === "student" ? (
+            <label className="field">
+              <span>Year of study</span>
+              <select
+                name="yearOfStudy"
+                defaultValue={state.values.yearOfStudy}
+                aria-invalid={!!state.errors.yearOfStudy}
+              >
+                {yearsOfStudy.map((year) => (
+                  <option key={year} value={year}>
+                    {yearLabels[year]}
+                  </option>
+                ))}
+              </select>
+              {state.errors.yearOfStudy ? <small>{state.errors.yearOfStudy}</small> : null}
+            </label>
+          ) : null}
 
           <label className="field field--wide">
             <span>Country</span>
@@ -133,21 +141,23 @@ export function ProfileForm({ initialState, returnTo, githubUsername }: ProfileF
             </label>
           )}
 
-          <label className="field">
-            <span>Student email / academic domain</span>
-            <input
-              name="studentEmailDomain"
-              defaultValue={state.values.studentEmailDomain}
-              placeholder="you@university.edu"
-              aria-invalid={!!state.errors.studentEmailDomain}
-            />
-            <small className="field-hint">
-              Required for students; professionals can leave this blank.
-            </small>
-            {state.errors.studentEmailDomain ? (
-              <small>{state.errors.studentEmailDomain}</small>
-            ) : null}
-          </label>
+          {role === "student" ? (
+            <label className="field">
+              <span>Student email / academic domain</span>
+              <input
+                name="studentEmailDomain"
+                defaultValue={state.values.studentEmailDomain}
+                placeholder="you@university.edu"
+                aria-invalid={!!state.errors.studentEmailDomain}
+              />
+              <small className="field-hint">
+                Required for students; professionals can leave this blank.
+              </small>
+              {state.errors.studentEmailDomain ? (
+                <small>{state.errors.studentEmailDomain}</small>
+              ) : null}
+            </label>
+          ) : null}
         </div>
       </section>
 

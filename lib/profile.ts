@@ -105,14 +105,20 @@ export function validateProfileForm(formData: FormData): {
   state: ProfileFormState;
   profile: UserProfile | null;
 } {
+  const role = String(formData.get("role") ?? "");
+  const isStudent = role === "student";
   const values = {
-    role: String(formData.get("role") ?? ""),
-    yearOfStudy: String(formData.get("yearOfStudy") ?? ""),
+    role,
+    yearOfStudy: isStudent
+      ? String(formData.get("yearOfStudy") ?? "")
+      : "not-applicable",
     country: sanitizeText(formData.get("country")),
     skills: sanitizeText(formData.get("skills")),
     interests: sanitizeText(formData.get("interests")),
     githubUsername: sanitizeText(formData.get("githubUsername")),
-    studentEmailDomain: sanitizeText(formData.get("studentEmailDomain")).toLowerCase()
+    studentEmailDomain: isStudent
+      ? sanitizeText(formData.get("studentEmailDomain")).toLowerCase()
+      : ""
   };
 
   const errors: ProfileFormState["errors"] = {};
@@ -123,7 +129,7 @@ export function validateProfileForm(formData: FormData): {
     errors.role = "Choose student or professional.";
   }
 
-  if (!yearsOfStudy.includes(values.yearOfStudy as YearOfStudy)) {
+  if (isStudent && !yearsOfStudy.includes(values.yearOfStudy as YearOfStudy)) {
     errors.yearOfStudy = "Choose a valid study year.";
   }
 
